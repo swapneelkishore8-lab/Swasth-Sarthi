@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>🩺 Swasth Sarthi — Rural Healthcare Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --mint:#dff7ef; --peach:#fff1e6; --ivory:#fffdf8; --accent:#7fc7b8; --muted:#556b6b;
+}
+*{box-sizing:border-box}
+body{ margin:0; font-family:'Poppins',sans-serif; background:linear-gradient(180deg,var(--ivory),#f7fbfb); color:#123; }
+.topbar{ display:flex; align-items:center; gap:12px; padding:14px 20px; background:linear-gradient(90deg,#eafaf6,#fff6f0); box-shadow:0 4px 14px rgba(0,0,0,0.06); }
+.logo{ width:56px; height:56px; border-radius:10px; object-fit:cover; border:2px solid rgba(0,0,0,0.04) }
+.title{ font-weight:700; font-size:20px; color:#0b3b36 }
+.subtitle{ color:var(--muted); font-size:13px; margin-top:4px }
+/* layout */
+.container{ max-width:1200px; margin:18px auto; display:grid; grid-template-columns:280px 1fr 320px; gap:16px; padding:12px }
+.left, .middle, .right{ border-radius:12px; background:white; padding:14px; box-shadow:0 10px 30px rgba(2,12,20,0.04) }
+/* left */
+.brand{ text-align:center }
+.brand .name{ font-weight:700; margin-top:8px }
+.quick button{ width:100%; border:none; background:linear-gradient(90deg,#e8fbf4,#fff6ec); padding:10px; margin:8px 0; border-radius:8px; text-align:left; cursor:pointer; font-weight:600; color:#0b3b36 }
+.awareness{ margin-top:12px; padding:10px; background:var(--mint); border-radius:8px; font-size:14px; color:#0b3b36 }
+/* middle */
+.tabs{ display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap }
+.tabBtn{ padding:8px 10px; border-radius:8px; border:1px solid rgba(2,12,20,0.04); background:transparent; cursor:pointer; font-weight:600 }
+.tabBtn.active{ background:linear-gradient(90deg,#bfeede,#ffdcb3); box-shadow:0 8px 20px rgba(2,12,20,0.04) }
+.card{ background:var(--ivory); border-radius:10px; padding:12px; box-shadow:0 6px 18px rgba(2,12,20,0.03); margin-bottom:10px }
+/* chat */
+#chatbox{ height:420px; overflow:auto; padding:12px; border-radius:10px; background:linear-gradient(180deg,#fbfffd,#fffaf6); }
+.msg{ margin:8px 0; display:flex; gap:10px; align-items:flex-start }
+.msg.bot{ justify-content:flex-start }
+.msg.user{ justify-content:flex-end; flex-direction:row-reverse }
+.bubble{ max-width:70%; padding:10px 12px; border-radius:10px; line-height:1.4 }
+.bubble.bot{ background:#f0fbf8; color:#063; border-bottom-left-radius:4px }
+.bubble.user{ background:linear-gradient(90deg,#7fc7b8,#ffa76b); color:white; border-bottom-right-radius:4px }
+/* input */
+.inputRow{ display:flex; gap:8px; align-items:center; margin-top:10px }
+.inputRow input{ flex:1; padding:10px; border-radius:8px; border:1px solid #e6e6e6 }
+.iconBtn{ padding:10px 12px; border-radius:8px; border:none; cursor:pointer; background:linear-gradient(90deg,#7fc7b8,#ffa76b); color:white }
+/* right */
+.section h4{ margin:0 0 8px 0; color:#0b3b36 }
+.small{ font-size:13px; color:var(--muted) }
+/* responsive */
+@media (max-width:1100px){ .container{ grid-template-columns:1fr; padding:8px } .left,.right{ display:none } }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <img src="https://images.unsplash.com/photo-1537368910025-700350fe46c7?q=80&w=800&auto=format&fit=crop&s=8c1f3b5b0f6feee9eab5b21f2b1f5b9e" class="logo" alt="logo">
+    <div>
+      <div class="title">Swasth Sarthi</div>
+      <div class="subtitle">Friendly rural healthcare assistant — Hinglish supported</div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- LEFT -->
+    <div class="left">
+      <div class="brand">
+        <img src="https://images.unsplash.com/photo-1537368910025-700350fe46c7?q=80&w=800&auto=format&fit=crop&s=8c1f3b5b0f6feee9eab5b21f2b1f5b9e" style="width:110px;border-radius:12px" alt="logo">
+        <div class="name">Swasth Sarthi</div>
+        <div class="small">Voice-enabled companion for rural health</div>
+      </div>
+
+      <div class="quick" style="margin-top:12px">
+        <button onclick="activateTab('chat')">💬 Chat Assistant</button>
+        <button onclick="activateTab('hospitals')">🏥 Hospitals</button>
+        <button onclick="activateTab('ngos')">🤝 NGOs & Aid</button>
+        <button onclick="activateTab('insurance')">🛡️ Insurance</button>
+        <button onclick="activateTab('education')">🎒 Education</button>
+        <button onclick="activateTab('tips')">🌤 Health Tips</button>
+        <button onclick="activateTab('feedback')">⭐ Feedback</button>
+      </div>
+
+      <div class="awareness">
+        <strong>Health Tip</strong>
+        <div id="leftQuote">Small steps—big health. Handwashing saves lives.</div>
+      </div>
+    </div>
+
+    <!-- MIDDLE -->
+    <div class="middle">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
+        <div style="display:flex; gap:8px; align-items:center">
+          <button class="tabBtn active" id="btn-chat" onclick="activateTab('chat')">Chat</button>
+          <button class="tabBtn" id="btn-hospitals" onclick="activateTab('hospitals')">Hospitals</button>
+          <button class="tabBtn" id="btn-ngos" onclick="activateTab('ngos')">NGOs</button>
+          <button class="tabBtn" id="btn-insurance" onclick="activateTab('insurance')">Insurance</button>
+          <button class="tabBtn" id="btn-education" onclick="activateTab('education')">Education</button>
+          <button class="tabBtn" id="btn-tips" onclick="activateTab('tips')">Health Tips</button>
+          <button class="tabBtn" id="btn-feedback" onclick="activateTab('feedback')">Feedback</button>
+        </div>
+        <div class="small">Voice: <span id="voiceLabel">loading…</span></div>
+      </div>
+
+      <!-- Chat view -->
+      <div id="chatView" class="card" style="display:block">
+        <div id="chatbox" aria-live="polite">
+          <div class="msg bot"><div class="bubble bot">Hello! मैं <strong>Swasth Sarthi</strong> हूँ — may I know your <strong>name</strong>?</div></div>
+        </div>
+
+        <div class="inputRow">
+          <input id="userInput" placeholder="Type or speak..." aria-label="Message input">
+          <button id="micBtn" class="iconBtn" title="Speak">🎤</button>
+          <button id="sendBtn" class="iconBtn" title="Send">➤</button>
+          <button id="resetBtn" class="iconBtn" title="Reset Chat">🔄</button>
+        </div>
+      </div>
+
+      <!-- Hospitals -->
+      <div id="hospitalsView" class="card" style="display:none">
+        <h3>Nearby Hospitals (Simulated)</h3>
+        <div id="hospitalList" class="small">Loading…</div>
+      </div>
+
+      <!-- NGOs -->
+      <div id="ngosView" class="card" style="display:none">
+        <h3>NGOs & Financial Aid</h3>
+        <div id="ngoList" class="small">Loading…</div>
+      </div>
+
+      <!-- Insurance -->
+      <div id="insuranceView" class="card" style="display:none">
+        <h3>Health Insurance (Sample)</h3>
+        <div id="insuranceList" class="small">Loading…</div>
+      </div>
+
+      <!-- Education -->
+      <div id="educationView" class="card" style="display:none">
+        <h3>Child & Teen Education</h3>
+        <div id="educationList" class="small">Loading…</div>
+      </div>
+
+      <!-- Health Tips (hidden until clicked) -->
+      <div id="tipsView" class="card" style="display:none">
+        <h3>Health Tips & Seasonal Advice</h3>
+        <div id="tipsList" class="small">Click the tab to load seasonal tips.</div>
+        <div style="margin-top:10px"><button onclick="rotateTips()" class="tabBtn">🔁 Get New Tips</button></div>
+      </div>
+
+      <!-- Feedback -->
+      <div id="feedbackView" class="card" style="display:none">
+        <h3>Feedback</h3>
+        <div class="small">
+          <label>Your name (optional)</label><br>
+          <input id="fbName" style="width:100%;padding:8px;border-radius:6px;border:1px solid #eee"><br><br>
+          <label>Rating (1-5)</label><br>
+          <input id="fbRating" type="number" min="1" max="5" style="width:100%;padding:8px;border-radius:6px;border:1px solid #eee"><br><br>
+          <label>Comments</label><br>
+          <textarea id="fbText" style="width:100%;padding:8px;border-radius:6px;border:1px solid #eee" rows="4"></textarea><br>
+          <div style="text-align:right;margin-top:8px">
+            <button onclick="submitFeedback()" class="tabBtn">Submit</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT -->
+    <div class="right">
+      <div class="section">
+        <h4>Emergency Helplines</h4>
+        <div id="ambulancePanel" class="small">Loading…</div>
+      </div>
+
+      <div class="section" style="margin-top:12px">
+        <h4>Quick Health Tips</h4>
+        <div class="small">Drink boiled/filtered water. Wash hands. Seek local ANM/ASHA for immunizations.</div>
+      </div>
+
+      <div class="section" style="margin-top:12px">
+        <h4>Nearby Summary</h4>
+        <div id="nearbySummary" class="small">Choose Hospitals tab to view simulated results.</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* =========== Configuration =========== */
+const API_BASE = ''; // same origin
+// Voice/TTS variables
+let voices = [], preferredVoice = null;
+
+/* =========== Utility =========== */
+const $ = id => document.getElementById(id);
+function escapeHtml(s){ return (s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* =========== Voice selection & TTS (prefer Indian female) =========== */
+function loadVoices(){
+  voices = speechSynthesis.getVoices() || [];
+  const prefer = ['Aditi','Raveena','Nirmala','Lekha','Google'];
+  preferredVoice = voices.find(v=> /hi|en-in|indian/i.test(v.lang) && prefer.some(p=> v.name && v.name.toLowerCase().includes(p.toLowerCase()))) || voices.find(v=> /hi|en-in|en/i.test(v.lang)) || voices[0] || null;
+  $('voiceLabel').textContent = preferredVoice ? `${preferredVoice.name} (${preferredVoice.lang})` : 'default';
+}
+if('speechSynthesis' in window){
+  loadVoices();
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  const u = new SpeechSynthesisUtterance(text.replace(/<[^>]*>?/gm,''));
+  if(preferredVoice) u.voice = preferredVoice;
+  u.rate = 0.95; u.pitch = 1.02;
+  speechSynthesis.cancel(); speechSynthesis.speak(u);
+}
+
+/* =========== Language detection heuristic =========== */
+function detectHindi(text){
+  if(!text) return false;
+  if(/[\u0900-\u097F]/.test(text)) return true;
+  const tokens = ['namaste','kya','kaise','hain','mera','dard','bukhar','tabiyat','dhanyavaad','dhanyavad','aap','nahi','haan'];
+  const low = text.toLowerCase();
+  return tokens.some(t => low.includes(t));
+}
+
+/* =========== Chat UI flow & onboarding (frontend mirrors to /profile) =========== */
+let profile = JSON.parse(localStorage.getItem('swasth_profile')||'{}');
+let history = JSON.parse(localStorage.getItem('swasth_history')||'[]');
+let step = profile && profile.name ? (profile.location?3:2) : 0; // 0:name->1:age->2:gender->3:location
+
+function pushHistory(sender, text){
+  history.push({sender,text,time:Date.now()});
+  localStorage.setItem('swasth_history', JSON.stringify(history));
+}
+function showMessage(sender, text, speakFlag=true){
+  const chatbox = $('chatbox');
+  const wrap = document.createElement('div'); wrap.className = 'msg ' + (sender==='bot'?'bot':'user');
+  const bubble = document.createElement('div'); bubble.className = 'bubble ' + (sender==='bot'?'bot':'user');
+  // Format bot replies for better structure
+  let formatted = escapeHtml(text)
+    .replace(/\n\s*\n/g, '</p><p>')
+    .replace(/\n/g, '<br>')
+    .replace(/(^|[\n>])\s*[-•]\s*(.+)/g, '$1<ul><li>$2</li></ul>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  bubble.innerHTML = '<p>' + formatted + '</p>';
+  wrap.appendChild(bubble);
+  chatbox.appendChild(wrap);
+  chatbox.scrollTop = chatbox.scrollHeight;
+  pushHistory(sender,text);
+  // TTS disabled for bot messages.
+  // if(sender==='bot' && speakFlag) speak(text);
+}
+// restore history
+history.forEach(m=> showMessage(m.sender,m.text,false));
+
+/* show typing placeholder */
+function showTyping(){
+  const chatbox = $('chatbox');
+  const el = document.createElement('div'); el.className='msg bot'; el.innerHTML = `<div class="bubble bot">...</div>`;
+  chatbox.appendChild(el); chatbox.scrollTop = chatbox.scrollHeight;
+  return el;
+}
+
+/* send message to backend */
+async function sendToBackend(text){
+  const tEl = showTyping();
+  try{
+    const form = new URLSearchParams();
+    // Detect Hindi and set lang param for backend
+    form.append('msg', text);
+    form.append('lang', detectHindi(text) ? 'hi' : 'en');
+    const res = await fetch(API_BASE + '/get', { method:'POST', body: form });
+    const data = await res.json();
+    tEl.remove();
+    showMessage('bot', data.reply || 'Sorry, server did not respond.');
+  }catch(e){
+    tEl.remove();
+    showMessage('bot', 'Could not reach server — please try later.');
+    console.error(e);
+  }
+}
+
+/* handle user input & onboarding */
+async function handleUserText(raw){
+  if(!raw || !raw.trim()) return;
+  const text = raw.trim();
+  showMessage('user', text, false);
+  $('userInput').value = '';
+
+  // onboarding (frontend)
+  if(step === 0){
+    profile.name = text.split(' ')[0];
+    localStorage.setItem('swasth_profile', JSON.stringify(profile));
+    showMessage('bot', `Nice to meet you ${profile.name}! How old are you?`);
+    step = 1; return;
+  }
+  if(step === 1){
+    const n = parseInt(text);
+    if(isNaN(n)){ showMessage('bot','Please enter age as a number (e.g., 30).'); return; }
+    profile.age = n; localStorage.setItem('swasth_profile', JSON.stringify(profile));
+    showMessage('bot','Thanks — what is your gender? (Male / Female / Other)');
+    step = 2; return;
+  }
+  if(step === 2){
+    profile.gender = text; localStorage.setItem('swasth_profile', JSON.stringify(profile));
+    showMessage('bot','Please tell me your village / district / state (e.g., Lucknow, Uttar Pradesh).');
+    step = 3; return;
+  }
+  if(step === 3 && !profile.location){
+    profile.location = text; localStorage.setItem('swasth_profile', JSON.stringify(profile));
+    showMessage('bot', `Thanks — saved your location as ${profile.location}. How can I help today?`);
+    // mirror profile to backend
+    mirrorProfileToServer();
+    return;
+  }
+
+  // normal chat
+  sendToBackend(text);
+  const low = text.toLowerCase();
+  if(low.includes('bye') || low.includes('thanks') || low.includes('dhanyavaad')) setTimeout(()=> activateTab('feedback'), 1400);
+}
+
+/* send profile to backend /profile */
+async function mirrorProfileToServer(){
+  if(!profile || !profile.name || !profile.age || !profile.gender || !profile.location) return;
+  try{
+    await fetch(API_BASE + '/profile', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(profile)
+    });
+    console.log('Profile mirrored to server');
+  }catch(err){
+    console.warn('Could not mirror profile to backend:', err);
+  }
+}
+
+/* UI events */
+$('sendBtn').addEventListener('click', ()=> handleUserText($('userInput').value));
+$('userInput').addEventListener('keypress', e=>{ if(e.key==='Enter') handleUserText($('userInput').value); });
+$('resetBtn').addEventListener('click', ()=>{
+  if(confirm('Are you sure you want to restart the chat?')){
+    localStorage.removeItem('swasth_profile');
+    localStorage.removeItem('swasth_history');
+    location.reload();
+  }
+});
+
+/* Speech recognition (listen) */
+let recognition = null;
+if('webkitSpeechRecognition' in window || 'SpeechRecognition' in window){
+  const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new Rec();
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+  recognition.onresult = ev => {
+    const transcript = ev.results[0][0].transcript;
+    handleUserText(transcript);
+  };
+  recognition.onerror = e => { console.warn('recog error', e); };
+}
+$('micBtn').addEventListener('click', ()=>{
+  if(!recognition){ alert('Speech recognition not supported in this browser. Use Chrome for best experience.'); return; }
+  try{ recognition.lang = 'en-IN'; recognition.start(); }catch(e){ console.warn(e); }
+});
+
+/* =========== Loading static sections from backend with fallbacks =========== */
+
+async function loadNGOs(){
+  try{
+    const res = await fetch(API_BASE + '/get_ngos'); const data = await res.json();
+    const list = $('ngoList'); list.innerHTML = '';
+    (data.ngos||[]).forEach(n=>{
+      list.innerHTML += `<div class="card"><b>${escapeHtml(n.name)}</b><div class="small">${escapeHtml(n.focus)}</div><div style="margin-top:6px"><a href="${n.link}" target="_blank">Visit</a></div></div>`;
+    });
+  }catch(e){
+    $('ngoList').innerHTML = '<div class="card"><b>Smile Foundation</b><div class="small">Rural health & education</div></div>';
+  }
+}
+
+async function loadAmbulance(){
+  try{
+    const res = await fetch(API_BASE + '/get_ambulance'); const data = await res.json();
+    const panel = $('ambulancePanel'); panel.innerHTML = '';
+    (data.helplines||[]).forEach(h=>{ panel.innerHTML += `<div class="small"><b>${escapeHtml(h.name)}</b><br>📞 ${escapeHtml(h.number)}</div><hr>`; });
+  }catch(e){
+    $('ambulancePanel').innerHTML = '<div class="small">National Ambulance: 108<br>Fire & Emergency: 101</div>';
+  }
+}
+
+async function loadHospitals(){
+  try{
+    const res = await fetch(API_BASE + '/get_hospitals'); const data = await res.json();
+    const container = $('hospitalList'); container.innerHTML = '';
+    Object.keys(data).forEach(state=>{
+      container.innerHTML += `<div style="font-weight:700;margin-top:8px">${escapeHtml(state)}</div>`;
+      (data[state]||[]).forEach(h=>{
+        container.innerHTML += `<div class="card"><b>${escapeHtml(h.name)}</b><div class="small">${escapeHtml(h.city)}</div><div class="small">📞 ${escapeHtml(h.contact)}</div></div>`;
+      });
+    });
+    $('nearbySummary').textContent = 'Loaded simulated hospital data.';
+  }catch(e){
+    // fallback simulated
+    const fallback = {
+      'Uttar Pradesh':[{"name":"District Hospital Lucknow","city":"Lucknow","contact":"0522-123456"}]
+    };
+    let html=''; Object.keys(fallback).forEach(s=>{ html+=`<div style="font-weight:700;margin-top:8px">${s}</div>`; fallback[s].forEach(h=> html+=`<div class="card"><b>${h.name}</b><div class="small">${h.city}</div><div class="small">📞 ${h.contact}</div></div>`); });
+    $('hospitalList').innerHTML = html;
+  }
+}
+
+async function loadInsurance(){
+  try{
+    const res = await fetch(API_BASE + '/get_insurance'); const data = await res.json();
+    const el = $('insuranceList'); el.innerHTML = '';
+    (data.insurance||[]).forEach(i=>{
+      el.innerHTML += `<div class="card"><b>${escapeHtml(i.company)}</b><div class="small">${escapeHtml(i.details)}</div></div>`;
+    });
+  }catch(e){
+    $('insuranceList').innerHTML = `<div class="card"><b>LIC Health Plans</b><div class="small">Government-backed policies & schemes</div></div>`;
+  }
+}
+
+async function loadEducation(){
+  try{
+    const res = await fetch(API_BASE + '/get_education'); const data = await res.json();
+    const el = $('educationList'); el.innerHTML = '';
+    (data.education||[]).forEach(it=> el.innerHTML += `<div class="card"><b>${escapeHtml(it.topic)}</b><div class="small">${escapeHtml(it.message)}</div></div>`);
+  }catch(e){
+    $('educationList').innerHTML = `<div class="card"><b>Clean Water</b><div class="small">Boil or filter drinking water</div></div>`;
+  }
+}
+
+/* =========== Health Tips (detailed) - load on demand =========== */
+let currentTips = []; let tipIndex = 0;
+async function loadTipsOnce(){
+  try{
+    const res = await fetch(API_BASE + '/get_tips'); const data = await res.json();
+    const tips = data.tips || {};
+    // choose season by month
+    const m = new Date().getMonth() + 1;
+    let season = 'general';
+    if(m>=3 && m<=5) season = 'spring';
+    else if(m>=6 && m<=9) season = 'monsoon';
+    else if(m>=10 && m<=12) season = 'winter';
+    else if(m>=1 && m<=2) season = 'winter';
+    if([6,7,8,9].includes(m)) season='monsoon';
+    if([3,4,5].includes(m)) season='summer';
+    currentTips = tips[season] || tips['general'] || [];
+    tipIndex = 0;
+    renderTips();
+  }catch(e){
+    // fallback local tips
+    currentTips = [
+      { title: "Clean Water", advice: "Boil water or use filter. ORS for dehydration." },
+      { title: "Hand Hygiene", advice: "Wash hands before meals and after toilet." }
+    ];
+    renderTips();
+  }
+}
+
+function renderTips(){
+  const container = $('tipsList');
+  if(!currentTips || currentTips.length===0){ container.innerHTML = '<div class="small">No tips available.</div>'; return; }
+  // show 3 tips starting at tipIndex
+  let html = '';
+  for(let i=0;i<3;i++){
+    const idx = (tipIndex + i) % currentTips.length;
+    const t = currentTips[idx];
+    html += `<div class="card"><b>${escapeHtml(t.title)}</b><div class="small" style="margin-top:6px">${escapeHtml(t.advice)}</div></div>`;
+  }
+  container.innerHTML = html;
+}
+
+function rotateTips(){
+  if(!currentTips || currentTips.length===0) return;
+  tipIndex = (tipIndex + 3) % currentTips.length;
+  renderTips();
+}
+
+/* =========== Feedback submit =========== */
+async function submitFeedback(){
+  const name = $('fbName').value || 'Anonymous';
+  const rating = $('fbRating').value || '';
+  const feedback = $('fbText').value || '';
+  try{
+    const res = await fetch(API_BASE + '/submit_feedback', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({name, rating, feedback})
+    });
+    const data = await res.json();
+    alert(data.reply || 'Thanks for your feedback!');
+    $('fbName').value=''; $('fbRating').value=''; $('fbText').value='';
+  }catch(e){
+    alert('Could not send feedback to server. It is saved locally instead.');
+    console.warn(e);
+    const saved = JSON.parse(localStorage.getItem('swasth_feedbacks')||'[]'); saved.unshift({name,rating,feedback,date:new Date().toISOString()}); localStorage.setItem('swasth_feedbacks', JSON.stringify(saved));
+  }
+}
+
+/* =========== Tab control (Health Tips tab loads tips on first open) =========== */
+let tipsLoaded = false;
+function activateTab(tab){
+  // hide all views
+  ['chatView','hospitalsView','ngosView','insuranceView','educationView','tipsView','feedbackView'].forEach(id=> $(id).style.display='none');
+  // remove active classes
+  ['btn-chat','btn-hospitals','btn-ngos','btn-insurance','btn-education','btn-tips','btn-feedback'].forEach(id=> $(id).classList.remove('active'));
+  // show selected
+  if(tab==='chat'){ $('chatView').style.display='block'; $('btn-chat').classList.add('active'); }
+  if(tab==='hospitals'){ $('hospitalsView').style.display='block'; $('btn-hospitals').classList.add('active'); }
+  if(tab==='ngos'){ $('ngosView').style.display='block'; $('btn-ngos').classList.add('active'); }
+  if(tab==='insurance'){ $('insuranceView').style.display='block'; $('btn-insurance').classList.add('active'); }
+  if(tab==='education'){ $('educationView').style.display='block'; $('btn-education').classList.add('active'); }
+  if(tab==='tips'){ $('tipsView').style.display='block'; $('btn-tips').classList.add('active'); if(!tipsLoaded){ loadTipsOnce(); tipsLoaded=true; } }
+  if(tab==='feedback'){ $('feedbackView').style.display='block'; $('btn-feedback').classList.add('active'); }
+}
+
+/* =========== Quotes rotation =========== */
+const quotes = ["Wash hands regularly — infections reduce.","Drink safe water to avoid diseases.","Early care saves lives — visit clinic for fever.","Pregnant women need regular checkups."];
+let qi = 0; setInterval(()=>{ $('leftQuote').textContent = quotes[qi]; qi=(qi+1)%quotes.length; }, 4200);
+
+/* =========== Init loads =========== */
+window.addEventListener('load', ()=>{
+  loadVoices();
+  loadNGOs(); loadAmbulance(); loadHospitals(); loadInsurance(); loadEducation();
+  // initial greeting in Hinglish
+  if(history.length===0) setTimeout(()=> speak("Namaste! Main Swasth Sarthi hoon — kaise madad karun aaj?"), 600);
+});
+
+/* Expose for debugging */
+window._swasth = { showMessage, activateTab, loadTipsOnce, rotateTips };
+
+</script>
+</body>
+</html>
